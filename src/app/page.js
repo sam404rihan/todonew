@@ -1,59 +1,59 @@
 "use client";
 // src/app/page.js
 import { useRef, useState, useEffect } from "react"; // Import React hooks
-import { db } from "./firebase.js"; // Adjust the import path for Firebase
-import { addDoc, collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore"; // Import Firestore functions
+import { db } from "./firebase.js"; 
+import { addDoc, collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 
 export default function Home() {
-    const messageRef = useRef(); // Create a reference for the input field
-    const ref = collection(db, "messages"); // Reference to the Firestore collection
+    const messageRef = useRef();
+    const ref = collection(db, "messages");
 
-    const [messages, setMessages] = useState([]); // State to hold fetched messages
+    const [messages, setMessages] = useState([]);
 
-    // Function to fetch data from Firestore in order (by timestamp)
+ 
     const fetchMessages = async () => {
         try {
-            const q = query(ref, orderBy("timestamp", "desc")); // Query to order messages by timestamp
+            const q = query(ref, orderBy("timestamp", "desc")); 
             const querySnapshot = await getDocs(q);
             const fetchedMessages = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
-            setMessages(fetchedMessages); // Update state with fetched messages
+            setMessages(fetchedMessages); 
         } catch (e) {
-            console.error(e); // Log any errors
+            console.error(e);
         }
     };
 
-    // Fetch messages on component mount
+   
     useEffect(() => {
         fetchMessages();
     }, []);
 
-    // Function to handle form submission
+   
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent default form submission behavior
-        const messageText = messageRef.current.value; // Get the message from the input
+        e.preventDefault(); 
+        const messageText = messageRef.current.value; 
 
-        if (messageText.trim()) { // Check if the input is not empty
+        if (messageText.trim()) {
             try {
                 await addDoc(ref, {
                     text: messageText,
-                    timestamp: new Date(), // Add a timestamp
+                    timestamp: new Date(),
                 });
-                messageRef.current.value = ""; // Clear the input field
-                fetchMessages(); // Refresh messages after adding a new one
+                messageRef.current.value = ""; 
+                fetchMessages(); 
             } catch (error) {
                 console.error("Error adding document: ", error);
             }
         }
     };
 
-    // Function to delete a message
+ 
     const handleDelete = async (id) => {
         try {
-            await deleteDoc(doc(ref, id)); // Delete the document from Firestore
-            fetchMessages(); // Refresh messages after deletion
+            await deleteDoc(doc(ref, id)); 
+            fetchMessages(); 
         } catch (error) {
             console.error("Error deleting document: ", error);
         }
@@ -84,7 +84,7 @@ export default function Home() {
                         <li key={message.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow hover:bg-gray-100">
                             <span>{message.text}</span>
                             <button
-                                onClick={() => handleDelete(message.id)} // Call handleDelete with the message id
+                                onClick={() => handleDelete(message.id)}
                                 className="text-red-600 hover:text-red-800 transition"
                             >
                                 Delete
